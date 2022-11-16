@@ -10,8 +10,11 @@ int main(int argc, char *argv[]) {
     const char *FILE_INPUT = "/mnt/c/Users/User/Desktop/programs/differentiator/res/text.txt";
 
     Tree tree = {};
-    create_tree(FILE_INPUT, &tree);
-    printf("вот это еще интереснее %s\n", tree.root_tree->var_value);
-    printf_tree(tree.root_tree);
 
+    ctor_tree(FILE_INPUT, &tree);
+    
+    printf_tree(tree.root_tree);
+    dump_tree(tree.root_tree);
+
+    dtor_tree(tree.root_tree);
 }
