@@ -16,8 +16,8 @@ enum TYPE_OPERATION {
     OP_SUB = '-',
     OP_DIV = '/', 
     OP_MUL = '*',
-    OP_SIN = 's',
-    OP_COS = 'c',
+    OP_SIN = 'sin',
+    OP_COS = 'cos',
 };
 
 struct Node {
@@ -53,4 +53,29 @@ void dump_tree(Node *root);
 
 void graph_dump(FILE *dot_file, Node *node, Node *node_son);
 
+
+
+
+#define CREATE_NUM(val) create_node(TP_NUMBER, val, NULL, NULL)
+
+#define ADD_(node1, node2) create_node(TP_OPERATION, OP_ADD, node1, node2)
+
+#define SUB(node1, node2) create_node(TP_OPERATION, OP_SUB, node1, node2)
+
+#define MUL(node1, node2) create_node(TP_OPERATION, OP_MUL, node1, node2)
+
+#define DIV(node1,node2)  create_node(TP_OPERATION, OP_DIV, node1, node2)
+
+#define dL diff_tree(node->left)
+#define dR diff_tree(node->right)
+#define cL copy_tree(node->left)
+#define cR copy_tree(node->right)
+
+#define ADD(node1, node2) 
+
+Node *diff_tree(Node *node);
+
+Node *copy_tree(Node *node); 
+
+Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right);
 #endif

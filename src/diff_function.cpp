@@ -1,6 +1,8 @@
 #include "../include/diff_function.hpp"
 #include "../include/file.hpp"
 
+
+
 const char *NAME_GRAPH_FILE = "/mnt/c/Users/User/Desktop/programs/differentiator/res/graph.dot";
 
 const char *NAME_FILE = "/mnt/c/Users/User/Desktop/programs/differentiator/res/text_output.txt";
@@ -60,6 +62,10 @@ Node *tree_add_elem(Node *node, tree_elem_t elem) {
 
     if (isdigit(*elem)) {
         node->type_node = TP_NUMBER;
+        // double 
+        // sscanf("2", "%f", node->dbl_value);
+        // printf("я dbl\n");
+
         node->dbl_value = atoi(elem); //придумать че тут делать с даблами
     } else {
         switch (*elem) {
@@ -79,11 +85,12 @@ Node *tree_add_elem(Node *node, tree_elem_t elem) {
                 node->type_node = TP_OPERATION;
                 node->op_value = OP_MUL;
                 break;
-            } case OP_SIN: {
+            } case ('s'): { //115
                 node->type_node = TP_OPERATION;
                 node->op_value = OP_SIN;
+                // printf("я синус");
                 break;
-            } case OP_COS: {
+            } case ('c'): { //99
                 node->type_node = TP_OPERATION;
                 node->op_value = OP_COS;
                 break;
@@ -101,11 +108,7 @@ Node *tree_add_elem(Node *node, tree_elem_t elem) {
 void dtor_tree(Node *node) {
 
     if (!node) return;
-
-    if (node->type_node == TP_VAR) {
-        free(node->var_value);
-    }
-
+    
     dtor_tree(node->left);
     node->left = NULL;
 
@@ -114,23 +117,22 @@ void dtor_tree(Node *node) {
     free(node);
 }
 
+//--------------------------------------BEGIN TREE OUNPUT--------------------------------------------------------
 
 void printf_tree(Node *node) {
 
     if (!node) return;
 
-    if (node) {
-        if (node->left) {
-            fprintf(file_tree, "(");
-            printf_tree(node->left);
-        }
+    if (node->left) {
+        fprintf(file_tree, "(");
+        printf_tree(node->left);
+    }
 
-        print_node(file_tree, node);
-        
-        if (node->right) {
-            printf_tree(node->right);
-            fprintf(file_tree, ")");
-        }
+    print_node(file_tree, node);
+    
+    if (node->right) {
+        printf_tree(node->right);
+        fprintf(file_tree, ")");
     }
 }
 
@@ -140,14 +142,29 @@ void print_node(FILE *file, Node *node) {
 
     switch (node->type_node) {
         case TP_OPERATION:
-            fprintf(file, "%c", (char)node->op_value);
+            switch (node->op_value) {
+            case OP_SIN:
+                fprintf(file, "%s", "sin");
+                break;
+
+            case OP_COS:
+                fprintf(file, "%s", "cos");
+                break;
+
+            default:
+                fprintf(file, "%c", node->op_value);
+                break;
+            }
             break;
+
         case TP_VAR:
             fprintf(file, "%s", node->var_value);
             break;
+
         case TP_NUMBER:
             fprintf(file, "%g", node->dbl_value);
             break;
+
         default:
             break;
     }
@@ -157,7 +174,7 @@ void close_file() {
     fclose(file_tree);
 }
 
-
+static int count_png = 0;
 
 void dump_tree(Node *root) {
 
@@ -176,8 +193,8 @@ void dump_tree(Node *root) {
     const int size_cmd = 100; 
     char cmd[size_cmd] = "";
     
-    sprintf(cmd, "dot res/graph.dot -Tpng -o res/output.png 2>text_error.txt");
-
+    sprintf(cmd, "dot res/graph.dot -Tpng -o res/output%d.png 2>text_error.txt", count_png);
+    count_png++;
     system(cmd);
     
 }
@@ -201,5 +218,97 @@ void graph_dump(FILE *dot_file, Node *node, Node *node_son) {
 
         graph_dump(dot_file, node_son, node_son->left);
         graph_dump(dot_file, node_son, node_son->right);
+    }
+}
+
+//--------------------------------------END TREE OUNPUT--------------------------------------------------------
+
+
+//------------------------------------DIFFERENTIATOR-----------------------------------------------------------
+
+
+Node *copy_tree(Node *node) {
+
+    if (!node) return node;
+
+    Node *copy_node = (Node *) calloc(1, sizeof(Node));
+
+    copy_node->left      = node->left;
+    copy_node->right     = node->right;
+    copy_node->dbl_value = node->dbl_value;
+    copy_node->op_value  = node->op_value;
+    copy_node->right     = node->right;
+    copy_node->type_node = node->type_node;
+    copy_node->var_value = node->var_value;
+
+    if (node->left) {
+        copy_node->left = copy_tree(copy_node->left);
+    }
+
+    if (node->right) {
+        copy_node->right = copy_tree(copy_node->right);
+    }
+
+    return copy_node;
+
+}
+
+Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right) {
+    
+    Node *node = (Node *)calloc(1, sizeof(Node));
+
+    node->type_node = tp_node;
+    node->left = node_left;
+    node->right = node_right;
+
+    switch (tp_node) {
+        case TP_NUMBER:
+            node->dbl_value = value;
+            break;
+
+        case TP_OPERATION:
+            node->op_value = (TYPE_OPERATION)value;
+            break;
+
+        default:
+            break;
+    }
+    return node;
+}
+
+Node *diff_tree(Node *node) {
+
+    switch (node->type_node) {
+        case TP_NUMBER: return CREATE_NUM(0);
+
+        case TP_VAR:    return CREATE_NUM(1);
+
+        case TP_OPERATION: {
+            switch (node->op_value){
+                case OP_ADD: 
+                    return ADD_(dL, dR);
+
+                case OP_SUB: 
+                    return SUB(dL, dR);
+
+                case OP_MUL:
+                    return ADD_(MUL(dL, cR), MUL(cL, dR));
+
+                case OP_DIV: 
+                    return DIV(SUB(MUL(dL, cR), MUL(cL, dR)), MUL(cR, cR));
+                
+            // case OP_SIN:
+            //     return;
+            
+            // case OP_COS:
+            //     return;
+            default:
+                break;
+            }
+        }
+    
+        default:
+            return node;
+            break;
     }
 }
