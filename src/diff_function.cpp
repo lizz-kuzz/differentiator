@@ -56,7 +56,7 @@ Node *create_tree_from_text(Node *node, char **text_buf) {
     return node;
 }
 
-Node *tree_add_elem(Node *node, tree_elem_t elem) {
+Node *tree_add_elem(Node *node, char *elem) {
 
     assert(node && "null node");
 
@@ -71,32 +71,42 @@ Node *tree_add_elem(Node *node, tree_elem_t elem) {
         switch (*elem) {
             case OP_ADD: {
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_ADD;
+                node->op_value  = OP_ADD;
                 break;
             } case OP_SUB: {
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_SUB;
+                node->op_value  = OP_SUB;
                 break;
             } case OP_DIV: {
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_DIV;
+                node->op_value  = OP_DIV;
                 break;
             } case OP_MUL: {
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_MUL;
+                node->op_value  = OP_MUL;
+                break;
+            } case OP_DEG: {
+                node->type_node = TP_OPERATION;
+                node->op_value  = OP_DEG;
                 break;
             } case ('s'): { //115
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_SIN;
-                // printf("я синус");
+                node->op_value  = OP_SIN;
+                node->left = NULL;
                 break;
             } case ('c'): { //99
                 node->type_node = TP_OPERATION;
-                node->op_value = OP_COS;
+                node->op_value  = OP_COS;
+                node->left = NULL;
+                break;            
+            } case ('l'): { 
+                node->type_node = TP_OPERATION;
+                node->op_value  = OP_LN;
+                node->left = NULL;
                 break;
             } default: {
                 node->type_node = TP_VAR;
-                node->var_value = (tree_elem_t) calloc(MAX_SIZE, sizeof(char));
+                node->var_value = (char *) calloc(MAX_SIZE, sizeof(char));
                 node->var_value = strcpy(node->var_value, elem);
                 break;
             }
@@ -108,7 +118,7 @@ Node *tree_add_elem(Node *node, tree_elem_t elem) {
 void dtor_tree(Node *node) {
 
     if (!node) return;
-    
+
     dtor_tree(node->left);
     node->left = NULL;
 
@@ -128,7 +138,13 @@ void printf_tree(Node *node) {
         printf_tree(node->left);
     }
 
-    print_node(file_tree, node);
+    // if (!node->left && !node->right) {
+    //     fprintf(file_tree, "(");
+    //     print_node(file_tree, node);
+    //     fprintf(file_tree, ")");
+    // } else {
+        print_node(file_tree, node);
+    // }
     
     if (node->right) {
         printf_tree(node->right);
@@ -143,25 +159,33 @@ void print_node(FILE *file, Node *node) {
     switch (node->type_node) {
         case TP_OPERATION:
             switch (node->op_value) {
-            case OP_SIN:
-                fprintf(file, "%s", "sin");
-                break;
+                case OP_SIN:
+                    fprintf(file, "%s", "sin");
+                    break;
 
-            case OP_COS:
-                fprintf(file, "%s", "cos");
-                break;
+                case OP_COS:
+                    fprintf(file, "%s", "cos");
+                    break;
 
-            default:
-                fprintf(file, "%c", node->op_value);
-                break;
+                case OP_LN:
+                    fprintf(file, "%s", "ln");
+                    // printf("i'm ln\n");
+                    break;
+            
+                default:
+                    fprintf(file, "%c", node->op_value);
+                    // printf("i'm oper\n");
+                    break;
             }
             break;
 
         case TP_VAR:
             fprintf(file, "%s", node->var_value);
+            // printf("i'm var\n");
             break;
 
         case TP_NUMBER:
+            // printf("i'm num\n");
             fprintf(file, "%g", node->dbl_value);
             break;
 
@@ -205,20 +229,20 @@ void graph_dump(FILE *dot_file, Node *node, Node *node_son) {
     if (!node_son) {
         return;
     }
-    if (node) {
-        fprintf   (dot_file, "\tnode%p[label=\"", node);
-        print_node(dot_file, node);
-        fprintf   (dot_file, "\"]\n");
 
-        fprintf   (dot_file, "\tnode%p[label=\"", node_son);
-        print_node(dot_file, node_son);
-        fprintf   (dot_file, "\"]\n");
-       
-        fprintf(dot_file, "\tnode%p -> node%p\n", node, node_son);
+    fprintf   (dot_file, "\tnode%p[label=\"", node);
+    print_node(dot_file, node);
+    fprintf   (dot_file, "\"]\n");
 
-        graph_dump(dot_file, node_son, node_son->left);
-        graph_dump(dot_file, node_son, node_son->right);
-    }
+    fprintf   (dot_file, "\tnode%p[label=\"", node_son);
+    print_node(dot_file, node_son);
+    fprintf   (dot_file, "\"]\n");
+    
+    fprintf(dot_file, "\tnode%p -> node%p\n", node, node_son);
+
+    graph_dump(dot_file, node_son, node_son->left);
+    graph_dump(dot_file, node_son, node_son->right);
+
 }
 
 //--------------------------------------END TREE OUNPUT--------------------------------------------------------
@@ -286,24 +310,38 @@ Node *diff_tree(Node *node) {
         case TP_OPERATION: {
             switch (node->op_value){
                 case OP_ADD: 
-                    return ADD_(dL, dR);
+                    return ADD(dL, dR);
 
                 case OP_SUB: 
                     return SUB(dL, dR);
 
                 case OP_MUL:
-                    return ADD_(MUL(dL, cR), MUL(cL, dR));
+                    return ADD(MUL(dL, cR), MUL(cL, dR));
 
                 case OP_DIV: 
                     return DIV(SUB(MUL(dL, cR), MUL(cL, dR)), MUL(cR, cR));
                 
-            // case OP_SIN:
-            //     return;
-            
-            // case OP_COS:
-            //     return;
-            default:
-                break;
+                case OP_SIN:
+                    return MUL(COS(cR), dR);
+                
+                case OP_COS:
+                    return MUL(MUL(SIN(cR), CREATE_NUM(-1)), dR);
+                
+                case OP_DEG:
+                    if (node->left->type_node == TP_NUMBER) {
+                        return MUL(DEG(cL, cR), MUL(dR, LN(cL)));
+                    } else {
+                        return MUL(DEG(cL, SUB(cR, CREATE_NUM(1))), dL);
+                    }
+
+                case OP_LN:
+                    if (node->right->type_node == TP_NUMBER) {
+                        return CREATE_NUM(0);
+                    } else {
+                        return MUL(DIV(CREATE_NUM(1), cR), dR);
+                    }
+                default:
+                    break;
             }
         }
     

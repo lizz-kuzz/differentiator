@@ -1,44 +1,26 @@
 digraph {
-	node0x555ed01d5b30[label="/"]
-	node0x555ed01d5b00[label="-"]
-	node0x555ed01d5b30 -> node0x555ed01d5b00
-	node0x555ed01d5b00[label="-"]
-	node0x555ed01d5ad0[label="*"]
-	node0x555ed01d5b00 -> node0x555ed01d5ad0
-	node0x555ed01d5ad0[label="*"]
-	node0x555ed01d5aa0[label="+"]
-	node0x555ed01d5ad0 -> node0x555ed01d5aa0
-	node0x555ed01d5aa0[label="+"]
-	node0x555ed01d5a70[label="0"]
-	node0x555ed01d5aa0 -> node0x555ed01d5a70
-	node0x555ed01d5aa0[label="+"]
-	node0x555ed01d5a40[label="1"]
-	node0x555ed01d5aa0 -> node0x555ed01d5a40
-	node0x555ed01d5ad0[label="*"]
-	node0x555ed01d5a10[label="x"]
-	node0x555ed01d5ad0 -> node0x555ed01d5a10
-	node0x555ed01d5b00[label="-"]
-	node0x555ed01d59e0[label="*"]
-	node0x555ed01d5b00 -> node0x555ed01d59e0
-	node0x555ed01d59e0[label="*"]
-	node0x555ed01d5950[label="+"]
-	node0x555ed01d59e0 -> node0x555ed01d5950
-	node0x555ed01d5950[label="+"]
-	node0x555ed01d5980[label="1"]
-	node0x555ed01d5950 -> node0x555ed01d5980
-	node0x555ed01d5950[label="+"]
-	node0x555ed01d59b0[label="x"]
-	node0x555ed01d5950 -> node0x555ed01d59b0
-	node0x555ed01d59e0[label="*"]
-	node0x555ed01d5920[label="1"]
-	node0x555ed01d59e0 -> node0x555ed01d5920
-	node0x555ed01d5b30[label="/"]
-	node0x555ed01d58f0[label="*"]
-	node0x555ed01d5b30 -> node0x555ed01d58f0
-	node0x555ed01d58f0[label="*"]
-	node0x555ed01d58c0[label="x"]
-	node0x555ed01d58f0 -> node0x555ed01d58c0
-	node0x555ed01d58f0[label="*"]
-	node0x555ed01d5890[label="x"]
-	node0x555ed01d58f0 -> node0x555ed01d5890
+	node0x5604d8f3f9a0[label="*"]
+	node0x5604d8f3f970[label="/"]
+	node0x5604d8f3f9a0 -> node0x5604d8f3f970
+	node0x5604d8f3f970[label="/"]
+	node0x5604d8f3f940[label="1"]
+	node0x5604d8f3f970 -> node0x5604d8f3f940
+	node0x5604d8f3f970[label="/"]
+	node0x5604d8f3f8b0[label="-"]
+	node0x5604d8f3f970 -> node0x5604d8f3f8b0
+	node0x5604d8f3f8b0[label="-"]
+	node0x5604d8f3f8e0[label="x"]
+	node0x5604d8f3f8b0 -> node0x5604d8f3f8e0
+	node0x5604d8f3f8b0[label="-"]
+	node0x5604d8f3f910[label="1"]
+	node0x5604d8f3f8b0 -> node0x5604d8f3f910
+	node0x5604d8f3f9a0[label="*"]
+	node0x5604d8f3f880[label="-"]
+	node0x5604d8f3f9a0 -> node0x5604d8f3f880
+	node0x5604d8f3f880[label="-"]
+	node0x5604d8f3f850[label="1"]
+	node0x5604d8f3f880 -> node0x5604d8f3f850
+	node0x5604d8f3f880[label="-"]
+	node0x5604d8f3f820[label="0"]
+	node0x5604d8f3f880 -> node0x5604d8f3f820
 }

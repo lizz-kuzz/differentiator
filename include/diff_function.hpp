@@ -18,6 +18,8 @@ enum TYPE_OPERATION {
     OP_MUL = '*',
     OP_SIN = 'sin',
     OP_COS = 'cos',
+    OP_DEG = '^',
+    OP_LN  = 'ln',
 };
 
 struct Node {
@@ -33,49 +35,56 @@ struct Tree {
     Node *root_tree;
 };
 
-typedef char * tree_elem_t; 
-
-void printf_tree(Node *node);
-
-void print_node(FILE *file, Node *node);
-
 Node *create_tree_from_text(Node *node, char **text_buf);
 
 void ctor_tree(const char *FILE_INPUT, Tree *tree);
 
 void dtor_tree(Node *node);
 
-Node *tree_add_elem(Node *node, tree_elem_t elem);
+Node *tree_add_elem(Node *node, char *elem);
 
-void close_file();
+
 
 void dump_tree(Node *root);
 
+void printf_tree(Node *node);
+
+void print_node(FILE *file, Node *node);
+
 void graph_dump(FILE *dot_file, Node *node, Node *node_son);
 
+void close_file();
 
 
 
-#define CREATE_NUM(val) create_node(TP_NUMBER, val, NULL, NULL)
+#define CREATE_NUM(val)       create_node(TP_NUMBER, val, NULL, NULL)
 
-#define ADD_(node1, node2) create_node(TP_OPERATION, OP_ADD, node1, node2)
+#define ADD(node_l, node_r)   create_node(TP_OPERATION, OP_ADD, node_l, node_r)
 
-#define SUB(node1, node2) create_node(TP_OPERATION, OP_SUB, node1, node2)
+#define SUB(node_l, node_r)   create_node(TP_OPERATION, OP_SUB, node_l, node_r)
 
-#define MUL(node1, node2) create_node(TP_OPERATION, OP_MUL, node1, node2)
+#define MUL(node_l, node_r)   create_node(TP_OPERATION, OP_MUL, node_l, node_r)
 
-#define DIV(node1,node2)  create_node(TP_OPERATION, OP_DIV, node1, node2)
+#define DIV(node_l, node_r)   create_node(TP_OPERATION, OP_DIV, node_l, node_r)
+
+#define SIN(node)             create_node(TP_OPERATION, OP_SIN, NULL, node)
+
+#define COS(node)             create_node(TP_OPERATION, OP_COS, NULL, node)
+
+#define DEG(node_l, node_r)   create_node(TP_OPERATION, OP_DEG, node_l, node_r)
+
+#define LN(node)              create_node(TP_OPERATION, OP_LN, NULL, node)
 
 #define dL diff_tree(node->left)
 #define dR diff_tree(node->right)
 #define cL copy_tree(node->left)
 #define cR copy_tree(node->right)
 
-#define ADD(node1, node2) 
-
 Node *diff_tree(Node *node);
 
 Node *copy_tree(Node *node); 
 
 Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right);
+
+
 #endif
