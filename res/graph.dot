@@ -1,26 +1,8 @@
 digraph {
-	node0x5604d8f3f9a0[label="*"]
-	node0x5604d8f3f970[label="/"]
-	node0x5604d8f3f9a0 -> node0x5604d8f3f970
-	node0x5604d8f3f970[label="/"]
-	node0x5604d8f3f940[label="1"]
-	node0x5604d8f3f970 -> node0x5604d8f3f940
-	node0x5604d8f3f970[label="/"]
-	node0x5604d8f3f8b0[label="-"]
-	node0x5604d8f3f970 -> node0x5604d8f3f8b0
-	node0x5604d8f3f8b0[label="-"]
-	node0x5604d8f3f8e0[label="x"]
-	node0x5604d8f3f8b0 -> node0x5604d8f3f8e0
-	node0x5604d8f3f8b0[label="-"]
-	node0x5604d8f3f910[label="1"]
-	node0x5604d8f3f8b0 -> node0x5604d8f3f910
-	node0x5604d8f3f9a0[label="*"]
-	node0x5604d8f3f880[label="-"]
-	node0x5604d8f3f9a0 -> node0x5604d8f3f880
-	node0x5604d8f3f880[label="-"]
-	node0x5604d8f3f850[label="1"]
-	node0x5604d8f3f880 -> node0x5604d8f3f850
-	node0x5604d8f3f880[label="-"]
-	node0x5604d8f3f820[label="0"]
-	node0x5604d8f3f880 -> node0x5604d8f3f820
+	node0x56068832bbd0[label="+"]
+	node0x56068832bba0[label="8"]
+	node0x56068832bbd0 -> node0x56068832bba0
+	node0x56068832bbd0[label="+"]
+	node0x56068832ba50[label="7"]
+	node0x56068832bbd0 -> node0x56068832ba50
 }

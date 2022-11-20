@@ -25,7 +25,7 @@ enum TYPE_OPERATION {
 struct Node {
     TYPE_NODE       type_node;
     TYPE_OPERATION  op_value;
-    double          dbl_value;
+    int             value;
     char *          var_value;
     Node *          left;
     Node *          right;
@@ -86,5 +86,47 @@ Node *copy_tree(Node *node);
 
 Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right);
 
+
+#define IS_NODE_OP(OP) node->type_node == TP_OPERATION && node->op_value == OP
+
+#define IS_ZERO(node) node->type_node == TP_NUMBER && node->value == 0
+
+#define IS_ONE(node) node->type_node == TP_NUMBER && node->value == 1
+
+#define COPY_NODE(copy_node)                                    \
+                node->type_node = copy_node->type_node;         \
+                node->op_value = copy_node->op_value;           \
+                node->value = copy_node->value;                 \
+                node->var_value = copy_node->var_value;         \
+                               
+
+#define IS_CONST_NODE(node) node->left->type_node == TP_NUMBER && node->right->type_node == TP_NUMBER
+
+#define OP_CONST(OP)                                                         \
+                node->type_node = TP_NUMBER;                                \
+                switch (OP) {                                               \
+                case OP_ADD:                                                \
+                    node->value = node->left->value + node->right->value;   \
+                    break;                                                  \
+                case OP_SUB:                                                \
+                    node->value = node->left->value - node->right->value;   \
+                    break;                                                  \
+                case OP_MUL:                                                \
+                    node->value = node->left->value * node->right->value;   \
+                    break;                                                  \
+                case OP_DIV:                                                \
+                    node->value = node->left->value / node->right->value;   \
+                    break;                                                  \
+                default:                                                    \
+                    break;                                                  \
+                }                                                           \
+                node->left = NULL;                                          \
+                node->right = NULL;                                         \
+                node->op_value = (TYPE_OPERATION)0;                         \
+
+
+void optimizer_tree(Node *node);
+
+void folding_constant(Node *node);
 
 #endif

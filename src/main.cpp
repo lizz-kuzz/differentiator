@@ -16,8 +16,13 @@ int main(int argc, char *argv[]) {
     // printf_tree(tree.root_tree);
     dump_tree(tree.root_tree);
     tree.root_tree = diff_tree(tree.root_tree);
-    printf_tree(tree.root_tree);
     dump_tree(tree.root_tree);
+    optimizer_tree(tree.root_tree);
+    dump_tree(tree.root_tree);
+    optimizer_tree(tree.root_tree);
+
+    
+    printf_tree(tree.root_tree);
     dtor_tree(tree.root_tree);
     close_file();
 }

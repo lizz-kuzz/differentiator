@@ -66,7 +66,7 @@ Node *tree_add_elem(Node *node, char *elem) {
         // sscanf("2", "%f", node->dbl_value);
         // printf("я dbl\n");
 
-        node->dbl_value = atoi(elem); //придумать че тут делать с даблами
+        node->value = atoi(elem); //придумать че тут делать с даблами
     } else {
         switch (*elem) {
             case OP_ADD: {
@@ -186,7 +186,7 @@ void print_node(FILE *file, Node *node) {
 
         case TP_NUMBER:
             // printf("i'm num\n");
-            fprintf(file, "%g", node->dbl_value);
+            fprintf(file, "%d", node->value);
             break;
 
         default:
@@ -259,7 +259,7 @@ Node *copy_tree(Node *node) {
 
     copy_node->left      = node->left;
     copy_node->right     = node->right;
-    copy_node->dbl_value = node->dbl_value;
+    copy_node->value     = node->value;
     copy_node->op_value  = node->op_value;
     copy_node->right     = node->right;
     copy_node->type_node = node->type_node;
@@ -287,7 +287,7 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
     switch (tp_node) {
         case TP_NUMBER:
-            node->dbl_value = value;
+            node->value = value;
             break;
 
         case TP_OPERATION:
@@ -297,6 +297,7 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
         default:
             break;
     }
+
     return node;
 }
 
@@ -331,7 +332,7 @@ Node *diff_tree(Node *node) {
                     if (node->left->type_node == TP_NUMBER) {
                         return MUL(DEG(cL, cR), MUL(dR, LN(cL)));
                     } else {
-                        return MUL(DEG(cL, SUB(cR, CREATE_NUM(1))), dL);
+                        return MUL(MUL(cR, DEG(cL, SUB(cR, CREATE_NUM(1)))), dL);
                     }
 
                 case OP_LN:
@@ -349,4 +350,56 @@ Node *diff_tree(Node *node) {
             return node;
             break;
     }
+}
+
+
+//-------------------------------OPTIMIZER--------------------------------------------
+ 
+void optimizer_tree(Node *node) {
+    
+    folding_constant(node);
+    // свертвывание умножения на ноль
+
+
+}
+
+void folding_constant(Node *node) {
+    
+    if (!node) return;
+
+    // if (node->left) {
+        folding_constant(node->left);
+    // }
+
+    if (node->left && node->right) {
+    if (IS_NODE_OP(OP_MUL) && ((IS_ZERO(node->left)) || (IS_ZERO(node->right)))) {
+        node->type_node = TP_NUMBER;
+        node->value = 0;
+        node->op_value = (TYPE_OPERATION) 0;
+        node->left = NULL;
+        node->right = NULL;
+    } 
+    if (IS_NODE_OP(OP_MUL) && (IS_ONE(node->left))) {
+        COPY_NODE(node->right);
+        node->left = node->right->left;  
+        node->right = node->right->right;
+    } 
+    if (IS_NODE_OP(OP_MUL) && (IS_ONE(node->right))) {
+        COPY_NODE(node->left);
+        node->right = node->left->right;
+        node->left = node->left->left;  
+    } 
+    if (IS_NODE_OP(OP_ADD) && IS_ZERO(node->left)) {
+        COPY_NODE(node->right);
+        node->left = node->right->left;  
+        node->right = node->right->right;
+    }
+    if (node->type_node == TP_OPERATION && IS_CONST_NODE(node)) {
+        OP_CONST(node->op_value);
+    }
+    }
+    // if (node->right) {
+        folding_constant(node->right);
+    // }
+    return;
 }
