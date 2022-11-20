@@ -21,12 +21,18 @@ enum TYPE_OPERATION {
     OP_DEG = '^',
     OP_LN  = 'ln',
 };
+union type_node {
+    TYPE_OPERATION  oper;
+    int             number;
+    char *          var;
+};
 
 struct Node {
-    TYPE_NODE       type_node;
-    TYPE_OPERATION  op_value;
-    int             value;
-    char *          var_value;
+    TYPE_NODE       tp_node;
+    type_node       value;
+    // TYPE_OPERATION  op_value;
+    // int             value;
+    // char *          var_value;
     Node *          left;
     Node *          right;
 };
@@ -88,42 +94,44 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
 
 
-#define IS_NODE_OP(OP) node->type_node == TP_OPERATION && node->op_value == OP
+#define IS_NODE_OP(OP) node->tp_node == TP_OPERATION && node->value.oper == OP
 
-#define IS_ZERO(node) node->type_node == TP_NUMBER && node->value == 0
+#define IS_ZERO(node) node->tp_node == TP_NUMBER && node->value.number == 0
 
-#define IS_ONE(node) node->type_node == TP_NUMBER && node->value == 1
+#define IS_ONE(node) node->tp_node == TP_NUMBER && node->value.number == 1
 
 #define COPY_NODE(copy_node)                                    \
-                node->type_node = copy_node->type_node;         \
-                node->op_value = copy_node->op_value;           \
-                node->value = copy_node->value;                 \
-                node->var_value = copy_node->var_value;         \
+                node->tp_node = copy_node->tp_node;         \
+                node->value.oper = copy_node->value.oper;           \
+                node->value.number = copy_node->value.number;                 \
+                node->value.var = copy_node->value.var;         \
                                
 
-#define IS_CONST_NODE(node) node->left->type_node == TP_NUMBER && node->right->type_node == TP_NUMBER
+#define IS_CONST_NODE(node) node->left->tp_node == TP_NUMBER && node->right->tp_node == TP_NUMBER
 
 #define OP_CONST(OP)                                                         \
-                node->type_node = TP_NUMBER;                                \
+                node->tp_node = TP_NUMBER;                                \
                 switch (OP) {                                               \
                 case OP_ADD:                                                \
-                    node->value = node->left->value + node->right->value;   \
+                    node->value.number = node->left->value.number + node->right->value.number;   \
                     break;                                                  \
                 case OP_SUB:                                                \
-                    node->value = node->left->value - node->right->value;   \
+                    node->value.number = node->left->value.number - node->right->value.number;   \
                     break;                                                  \
                 case OP_MUL:                                                \
-                    node->value = node->left->value * node->right->value;   \
+                    node->value.number = node->left->value.number * node->right->value.number;   \
                     break;                                                  \
                 case OP_DIV:                                                \
-                    node->value = node->left->value / node->right->value;   \
+                    node->value.number = node->left->value.number / node->right->value.number;   \
                     break;                                                  \
                 default:                                                    \
                     break;                                                  \
                 }                                                           \
                 node->left = NULL;                                          \
                 node->right = NULL;                                         \
-                node->op_value = (TYPE_OPERATION)0;                         \
+                
+                
+                // node->value.oper = (TYPE_OPERATION)0;                         \
 
 
 void optimizer_tree(Node *node);

@@ -61,49 +61,49 @@ Node *tree_add_elem(Node *node, char *elem) {
     assert(node && "null node");
 
     if (isdigit(*elem)) {
-        node->type_node = TP_NUMBER;
-        node->value = atoi(elem); 
+        node->tp_node = TP_NUMBER;
+        node->value.number = atoi(elem); 
     } else {
         switch (*elem) {
             case OP_ADD: {
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_ADD;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_ADD;
                 break;
             } case OP_SUB: {
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_SUB;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_SUB;
                 break;
             } case OP_DIV: {
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_DIV;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_DIV;
                 break;
             } case OP_MUL: {
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_MUL;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_MUL;
                 break;
             } case OP_DEG: {
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_DEG;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_DEG;
                 break;
             } case ('s'): { //115
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_SIN;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_SIN;
                 node->left = NULL;
                 break;
             } case ('c'): { //99
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_COS;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_COS;
                 node->left = NULL;
                 break;            
             } case ('l'): { 
-                node->type_node = TP_OPERATION;
-                node->op_value  = OP_LN;
+                node->tp_node = TP_OPERATION;
+                node->value.oper  = OP_LN;
                 node->left = NULL;
                 break;
             } default: {
-                node->type_node = TP_VAR;
-                node->var_value = (char *) calloc(MAX_SIZE, sizeof(char));
-                node->var_value = strcpy(node->var_value, elem);
+                node->tp_node = TP_VAR;
+                node->value.var = (char *) calloc(MAX_SIZE, sizeof(char));
+                node->value.var = strcpy(node->value.var, elem);
                 break;
             }
         }
@@ -134,7 +134,6 @@ void printf_tree(Node *node) {
         printf_tree(node->left);
     }
 
-
     print_node(file_tree, node);
     
     if (node->right) {
@@ -147,9 +146,9 @@ void printf_tree(Node *node) {
 void print_node(FILE *file, Node *node) {
     assert(node && "node null");
 
-    switch (node->type_node) {
+    switch (node->tp_node) {
         case TP_OPERATION:
-            switch (node->op_value) {
+            switch (node->value.oper) {
                 case OP_SIN:
                     fprintf(file, "%s", "sin");
                     break;
@@ -163,17 +162,17 @@ void print_node(FILE *file, Node *node) {
                     break;
             
                 default:
-                    fprintf(file, "%c", node->op_value);
+                    fprintf(file, "%c", node->value.oper);
                     break;
             }
             break;
 
         case TP_VAR:
-            fprintf(file, "%s", node->var_value);
+            fprintf(file, "%s", node->value.var);
             break;
 
         case TP_NUMBER:
-            fprintf(file, "%d", node->value);
+            fprintf(file, "%d", node->value.number);
             break;
 
         default:
@@ -247,10 +246,12 @@ Node *copy_tree(Node *node) {
     copy_node->left      = node->left;
     copy_node->right     = node->right;
     copy_node->value     = node->value;
-    copy_node->op_value  = node->op_value;
+    // copy_node->value.number     = node->value.number;
+    // copy_node->value.var     = node->value.var;
+    // copy_node->value.oper     = node->value.oper;
+
     copy_node->right     = node->right;
-    copy_node->type_node = node->type_node;
-    copy_node->var_value = node->var_value;
+    copy_node->tp_node   = node->tp_node;
 
     if (node->left) {
         copy_node->left = copy_tree(copy_node->left);
@@ -268,17 +269,17 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
     
     Node *node = (Node *)calloc(1, sizeof(Node));
 
-    node->type_node = tp_node;
+    node->tp_node = tp_node;
     node->left = node_left;
     node->right = node_right;
 
     switch (tp_node) {
         case TP_NUMBER:
-            node->value = value;
+            node->value.number = value;
             break;
 
         case TP_OPERATION:
-            node->op_value = (TYPE_OPERATION)value;
+            node->value.oper = (TYPE_OPERATION)value;
             break;
 
         default:
@@ -290,13 +291,13 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
 Node *diff_tree(Node *node) {
    
-    switch (node->type_node) {
+    switch (node->tp_node) {
         case TP_NUMBER: return CREATE_NUM(0);
 
         case TP_VAR:    return CREATE_NUM(1);
 
         case TP_OPERATION: {
-            switch (node->op_value){
+            switch (node->value.oper){
                 case OP_ADD: 
                     return ADD(dL, dR);
 
@@ -316,14 +317,14 @@ Node *diff_tree(Node *node) {
                     return MUL(MUL(SIN(cR), CREATE_NUM(-1)), dR);
                 
                 case OP_DEG:
-                    if (node->left->type_node == TP_NUMBER) {
+                    if (node->left->tp_node == TP_NUMBER) {
                         return MUL(DEG(cL, cR), MUL(dR, LN(cL)));
                     } else {
                         return MUL(MUL(cR, DEG(cL, SUB(cR, CREATE_NUM(1)))), dL);
                     }
 
                 case OP_LN:
-                    if (node->right->type_node == TP_NUMBER) {
+                    if (node->right->tp_node == TP_NUMBER) {
                         return CREATE_NUM(0);
                     } else {
                         return MUL(DIV(CREATE_NUM(1), cR), dR);
@@ -348,7 +349,11 @@ void optimizer_tree(Node *node) {
     int continue_optimizer = 0;
 
     while (true) {
-        if (folding_constant(node, &continue_optimizer) == 0) break;
+        if (folding_constant(node, &continue_optimizer) == 0) {
+            // dump_tree(node);
+         
+            break;
+        }
         continue_optimizer = 0;
     }
 
@@ -364,9 +369,9 @@ int folding_constant(Node *node, int *continue_optimiz) {
     if (node->left && node->right) {
 
         if (IS_NODE_OP(OP_MUL) && ((IS_ZERO(node->left)) || (IS_ZERO(node->right)))) {
-            node->type_node = TP_NUMBER;
-            node->value = 0;
-            node->op_value = (TYPE_OPERATION) 0;
+            node->tp_node = TP_NUMBER;
+            node->value.number = 0;
+            node->value.oper = (TYPE_OPERATION) 0;
             node->left = NULL;
             node->right = NULL;
             *continue_optimiz = 1;
@@ -395,8 +400,8 @@ int folding_constant(Node *node, int *continue_optimiz) {
             node->left = node->left->left; 
             *continue_optimiz = 1;
 
-        } else if (node->type_node == TP_OPERATION && IS_CONST_NODE(node)) {
-            OP_CONST(node->op_value);
+        } else if (node->tp_node == TP_OPERATION && IS_CONST_NODE(node)) {
+            OP_CONST(node->value.oper);
             *continue_optimiz = 1;
         }
     }

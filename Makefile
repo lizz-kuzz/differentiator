@@ -7,5 +7,5 @@ FLAGS = -g -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-e
 
 
 all:
-	@$(CC) $(FLAGS) src/main.cpp src/file.cpp src/diff_function.cpp -o do.exe
+	@$(CC) $(FLAGS) src/main.cpp src/file.cpp src/diff_function.cpp -o do.out
 

@@ -1,20 +1,11 @@
 digraph {
-	node0x55d51602ee50[label="+"]
-	node0x55d51602ee20[label="7"]
-	node0x55d51602ee50 -> node0x55d51602ee20
-	node0x55d51602ee50[label="+"]
-	node0x55d51602ecd0[label="*"]
-	node0x55d51602ee50 -> node0x55d51602ecd0
-	node0x55d51602ecd0[label="*"]
-	node0x55d51602eb80[label="5"]
-	node0x55d51602ecd0 -> node0x55d51602eb80
-	node0x55d51602ecd0[label="*"]
-	node0x55d51602eb50[label="*"]
-	node0x55d51602ecd0 -> node0x55d51602eb50
-	node0x55d51602eb50[label="*"]
-	node0x55d51602eaf0[label="2"]
-	node0x55d51602eb50 -> node0x55d51602eaf0
-	node0x55d51602eb50[label="*"]
-	node0x55d51602eac0[label="x"]
-	node0x55d51602eb50 -> node0x55d51602eac0
+	node0x55eaf2242b60[label="*"]
+	node0x55eaf2242980[label="3"]
+	node0x55eaf2242b60 -> node0x55eaf2242980
+	node0x55eaf2242b60[label="*"]
+	node0x55eaf2242950[label="cos"]
+	node0x55eaf2242b60 -> node0x55eaf2242950
+	node0x55eaf2242950[label="cos"]
+	node0x55eaf22428f0[label="x"]
+	node0x55eaf2242950 -> node0x55eaf22428f0
 }
