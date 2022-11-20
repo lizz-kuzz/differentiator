@@ -62,11 +62,7 @@ Node *tree_add_elem(Node *node, char *elem) {
 
     if (isdigit(*elem)) {
         node->type_node = TP_NUMBER;
-        // double 
-        // sscanf("2", "%f", node->dbl_value);
-        // printf("я dbl\n");
-
-        node->value = atoi(elem); //придумать че тут делать с даблами
+        node->value = atoi(elem); 
     } else {
         switch (*elem) {
             case OP_ADD: {
@@ -138,13 +134,8 @@ void printf_tree(Node *node) {
         printf_tree(node->left);
     }
 
-    // if (!node->left && !node->right) {
-    //     fprintf(file_tree, "(");
-    //     print_node(file_tree, node);
-    //     fprintf(file_tree, ")");
-    // } else {
-        print_node(file_tree, node);
-    // }
+
+    print_node(file_tree, node);
     
     if (node->right) {
         printf_tree(node->right);
@@ -169,23 +160,19 @@ void print_node(FILE *file, Node *node) {
 
                 case OP_LN:
                     fprintf(file, "%s", "ln");
-                    // printf("i'm ln\n");
                     break;
             
                 default:
                     fprintf(file, "%c", node->op_value);
-                    // printf("i'm oper\n");
                     break;
             }
             break;
 
         case TP_VAR:
             fprintf(file, "%s", node->var_value);
-            // printf("i'm var\n");
             break;
 
         case TP_NUMBER:
-            // printf("i'm num\n");
             fprintf(file, "%d", node->value);
             break;
 
@@ -302,7 +289,7 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 }
 
 Node *diff_tree(Node *node) {
-
+   
     switch (node->type_node) {
         case TP_NUMBER: return CREATE_NUM(0);
 
@@ -352,54 +339,69 @@ Node *diff_tree(Node *node) {
     }
 }
 
+//-----------------------------------END DIFFERENTIATOR-----------------------------------------------------------
 
 //-------------------------------OPTIMIZER--------------------------------------------
  
 void optimizer_tree(Node *node) {
-    
-    folding_constant(node);
-    // свертвывание умножения на ноль
 
+    int continue_optimizer = 0;
 
+    while (true) {
+        if (folding_constant(node, &continue_optimizer) == 0) break;
+        continue_optimizer = 0;
+    }
+
+        dump_tree(node);
 }
 
-void folding_constant(Node *node) {
+int folding_constant(Node *node, int *continue_optimiz) {
     
-    if (!node) return;
+    if (!node) return *continue_optimiz;
 
-    // if (node->left) {
-        folding_constant(node->left);
-    // }
+    folding_constant(node->left, continue_optimiz);
 
     if (node->left && node->right) {
-    if (IS_NODE_OP(OP_MUL) && ((IS_ZERO(node->left)) || (IS_ZERO(node->right)))) {
-        node->type_node = TP_NUMBER;
-        node->value = 0;
-        node->op_value = (TYPE_OPERATION) 0;
-        node->left = NULL;
-        node->right = NULL;
-    } 
-    if (IS_NODE_OP(OP_MUL) && (IS_ONE(node->left))) {
-        COPY_NODE(node->right);
-        node->left = node->right->left;  
-        node->right = node->right->right;
-    } 
-    if (IS_NODE_OP(OP_MUL) && (IS_ONE(node->right))) {
-        COPY_NODE(node->left);
-        node->right = node->left->right;
-        node->left = node->left->left;  
-    } 
-    if (IS_NODE_OP(OP_ADD) && IS_ZERO(node->left)) {
-        COPY_NODE(node->right);
-        node->left = node->right->left;  
-        node->right = node->right->right;
+
+        if (IS_NODE_OP(OP_MUL) && ((IS_ZERO(node->left)) || (IS_ZERO(node->right)))) {
+            node->type_node = TP_NUMBER;
+            node->value = 0;
+            node->op_value = (TYPE_OPERATION) 0;
+            node->left = NULL;
+            node->right = NULL;
+            *continue_optimiz = 1;
+
+        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && (IS_ONE(node->left))) {
+            COPY_NODE(node->right);
+            node->left = node->right->left;  
+            node->right = node->right->right;
+            *continue_optimiz = 1;       
+
+        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && (IS_ONE(node->right))) {
+            COPY_NODE(node->left);
+            node->right = node->left->right;
+            node->left = node->left->left;  
+            *continue_optimiz = 1;
+
+        } else if ((IS_NODE_OP(OP_ADD) || IS_NODE_OP(OP_SUB)) && IS_ZERO(node->left)) {
+            COPY_NODE(node->right);
+            node->left = node->right->left;  
+            node->right = node->right->right;
+            *continue_optimiz = 1;
+
+        } else if ((IS_NODE_OP(OP_ADD) || IS_NODE_OP(OP_SUB)) && IS_ZERO(node->right)) {
+            COPY_NODE(node->left);
+            node->right = node->left->right;
+            node->left = node->left->left; 
+            *continue_optimiz = 1;
+
+        } else if (node->type_node == TP_OPERATION && IS_CONST_NODE(node)) {
+            OP_CONST(node->op_value);
+            *continue_optimiz = 1;
+        }
     }
-    if (node->type_node == TP_OPERATION && IS_CONST_NODE(node)) {
-        OP_CONST(node->op_value);
-    }
-    }
-    // if (node->right) {
-        folding_constant(node->right);
-    // }
-    return;
+    folding_constant(node->right, continue_optimiz);
+    return *continue_optimiz;
 }
+
+//-------------------------------END OPTIMIZER--------------------------------------------

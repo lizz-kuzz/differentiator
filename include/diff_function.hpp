@@ -87,6 +87,7 @@ Node *copy_tree(Node *node);
 Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right);
 
 
+
 #define IS_NODE_OP(OP) node->type_node == TP_OPERATION && node->op_value == OP
 
 #define IS_ZERO(node) node->type_node == TP_NUMBER && node->value == 0
@@ -127,6 +128,6 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
 void optimizer_tree(Node *node);
 
-void folding_constant(Node *node);
+int folding_constant(Node *node, int *continue_optimiz);
 
 #endif
