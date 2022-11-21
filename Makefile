@@ -5,7 +5,10 @@ FLAGS = -g -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-e
 		-Wtype-limits -Wwrite-strings -D_DEBUG
 СС = g++
 
+calc:
+	@$(CC) $(FLAGS) calculator/main.cpp src/file.cpp calculator/calculator.cpp -o calc.out
 
-all:
+diff:
 	@$(CC) $(FLAGS) src/main.cpp src/file.cpp src/diff_function.cpp -o do.out
+
 

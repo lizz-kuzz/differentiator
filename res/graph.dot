@@ -1,11 +1,44 @@
 digraph {
-	node0x55eaf2242b60[label="*"]
-	node0x55eaf2242980[label="3"]
-	node0x55eaf2242b60 -> node0x55eaf2242980
-	node0x55eaf2242b60[label="*"]
-	node0x55eaf2242950[label="cos"]
-	node0x55eaf2242b60 -> node0x55eaf2242950
-	node0x55eaf2242950[label="cos"]
-	node0x55eaf22428f0[label="x"]
-	node0x55eaf2242950 -> node0x55eaf22428f0
+	node0x555555605b60[label="+"]
+	node0x555555605b30[label="*"]
+	node0x555555605b60 -> node0x555555605b30
+	node0x555555605b30[label="*"]
+	node0x555555605b00[label="-"]
+	node0x555555605b30 -> node0x555555605b00
+	node0x555555605b00[label="-"]
+	node0x555555605ad0[label="0"]
+	node0x555555605b00 -> node0x555555605ad0
+	node0x555555605b00[label="-"]
+	node0x555555605aa0[label="0"]
+	node0x555555605b00 -> node0x555555605aa0
+	node0x555555605b30[label="*"]
+	node0x555555605a40[label="sin"]
+	node0x555555605b30 -> node0x555555605a40
+	node0x555555605a40[label="sin"]
+	node0x555555605a70[label="x"]
+	node0x555555605a40 -> node0x555555605a70
+	node0x555555605b60[label="+"]
+	node0x555555605a10[label="*"]
+	node0x555555605b60 -> node0x555555605a10
+	node0x555555605a10[label="*"]
+	node0x555555605980[label="-"]
+	node0x555555605a10 -> node0x555555605980
+	node0x555555605980[label="-"]
+	node0x5555556059b0[label="0"]
+	node0x555555605980 -> node0x5555556059b0
+	node0x555555605980[label="-"]
+	node0x5555556059e0[label="3"]
+	node0x555555605980 -> node0x5555556059e0
+	node0x555555605a10[label="*"]
+	node0x555555605950[label="*"]
+	node0x555555605a10 -> node0x555555605950
+	node0x555555605950[label="*"]
+	node0x555555605920[label="cos"]
+	node0x555555605950 -> node0x555555605920
+	node0x555555605920[label="cos"]
+	node0x5555556058f0[label="x"]
+	node0x555555605920 -> node0x5555556058f0
+	node0x555555605950[label="*"]
+	node0x5555556058c0[label="1"]
+	node0x555555605950 -> node0x5555556058c0
 }

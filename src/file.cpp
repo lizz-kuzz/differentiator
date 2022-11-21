@@ -63,16 +63,22 @@ long int count_symbols(FILE *file_input)  {
 
 char *program_text_normalize(char *text)  {
     assert(text != nullptr && "null pointer");
-   
-    char *point = text;
 
-    for (; *point != '\0'; point++)  { 
-        if (*point == '\n')  
-            *point = ' ';
+    char *copy_text = (char *) calloc(strlen(text) + 1, sizeof(char));
+
+    *copy_text = *text;
+    char *point = copy_text;
+    
+    for (; *text != '\0'; point++, text++)  { 
+        if (*text == '\n') 
+            *text = ' ';
         
-        if (*point == ' ')
-            point++;
+        if (*text == ' ')
+            text++;
+
+        *point = *text;
     }
-    return text;
+
+    return copy_text;
 }
 
