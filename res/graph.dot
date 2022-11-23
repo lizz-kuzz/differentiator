@@ -1,23 +1,65 @@
 digraph {
-	node0x563e2b18ffb0[label=" * "]
-	node0x563e2b18fda0[label="cos"]
-	node0x563e2b18ffb0 -> node0x563e2b18fda0
-	node0x563e2b18fda0[label="cos"]
-	node0x563e2b18fcb0[label=" - "]
-	node0x563e2b18fda0 -> node0x563e2b18fcb0
-	node0x563e2b18fcb0[label=" - "]
-	node0x563e2b18fce0[label=" * "]
-	node0x563e2b18fcb0 -> node0x563e2b18fce0
-	node0x563e2b18fce0[label=" * "]
-	node0x563e2b18fd10[label="x"]
-	node0x563e2b18fce0 -> node0x563e2b18fd10
-	node0x563e2b18fce0[label=" * "]
-	node0x563e2b18fd40[label="40"]
-	node0x563e2b18fce0 -> node0x563e2b18fd40
-	node0x563e2b18fcb0[label=" - "]
-	node0x563e2b18fd70[label="3"]
-	node0x563e2b18fcb0 -> node0x563e2b18fd70
-	node0x563e2b18ffb0[label=" * "]
-	node0x563e2b18fc80[label="40"]
-	node0x563e2b18ffb0 -> node0x563e2b18fc80
+	node0x55b03a32f630[label=" + "]
+	node0x55b03a32f600[label=" * "]
+	node0x55b03a32f630 -> node0x55b03a32f600
+	node0x55b03a32f600[label=" * "]
+	node0x55b03a32f390[label=" * "]
+	node0x55b03a32f600 -> node0x55b03a32f390
+	node0x55b03a32f390[label=" * "]
+	node0x55b03a32f360[label="sin"]
+	node0x55b03a32f390 -> node0x55b03a32f360
+	node0x55b03a32f360[label="sin"]
+	node0x55b03a32f210[label=" - "]
+	node0x55b03a32f360 -> node0x55b03a32f210
+	node0x55b03a32f210[label=" - "]
+	node0x55b03a32f240[label=" / "]
+	node0x55b03a32f210 -> node0x55b03a32f240
+	node0x55b03a32f240[label=" / "]
+	node0x55b03a32f270[label=" ^ "]
+	node0x55b03a32f240 -> node0x55b03a32f270
+	node0x55b03a32f270[label=" ^ "]
+	node0x55b03a32f2a0[label="x"]
+	node0x55b03a32f270 -> node0x55b03a32f2a0
+	node0x55b03a32f270[label=" ^ "]
+	node0x55b03a32f2d0[label="3333"]
+	node0x55b03a32f270 -> node0x55b03a32f2d0
+	node0x55b03a32f240[label=" / "]
+	node0x55b03a32f300[label="40"]
+	node0x55b03a32f240 -> node0x55b03a32f300
+	node0x55b03a32f210[label=" - "]
+	node0x55b03a32f330[label="3"]
+	node0x55b03a32f210 -> node0x55b03a32f330
+	node0x55b03a32f390[label=" * "]
+	node0x55b03a32f1e0[label="(-1)"]
+	node0x55b03a32f390 -> node0x55b03a32f1e0
+	node0x55b03a32f600[label=" * "]
+	node0x55b03a32f1b0[label=" / "]
+	node0x55b03a32f600 -> node0x55b03a32f1b0
+	node0x55b03a32f1b0[label=" / "]
+	node0x55b03a32f150[label=" * "]
+	node0x55b03a32f1b0 -> node0x55b03a32f150
+	node0x55b03a32f150[label=" * "]
+	node0x55b03a32f0f0[label=" * "]
+	node0x55b03a32f150 -> node0x55b03a32f0f0
+	node0x55b03a32f0f0[label=" * "]
+	node0x55b03a32f090[label="3333"]
+	node0x55b03a32f0f0 -> node0x55b03a32f090
+	node0x55b03a32f0f0[label=" * "]
+	node0x55b03a32f060[label=" ^ "]
+	node0x55b03a32f0f0 -> node0x55b03a32f060
+	node0x55b03a32f060[label=" ^ "]
+	node0x55b03a32f030[label="x"]
+	node0x55b03a32f060 -> node0x55b03a32f030
+	node0x55b03a32f060[label=" ^ "]
+	node0x55b03a32f000[label="3332"]
+	node0x55b03a32f060 -> node0x55b03a32f000
+	node0x55b03a32f150[label=" * "]
+	node0x55b03a32ef40[label="40"]
+	node0x55b03a32f150 -> node0x55b03a32ef40
+	node0x55b03a32f1b0[label=" / "]
+	node0x55b03a32ee20[label="1600"]
+	node0x55b03a32f1b0 -> node0x55b03a32ee20
+	node0x55b03a32f630[label=" + "]
+	node0x55b03a32ed60[label="5"]
+	node0x55b03a32f630 -> node0x55b03a32ed60
 }

@@ -85,17 +85,17 @@ Node *tree_add_elem(Node *node, char *elem) {
                 node->tp_node = TP_OPERATION;
                 node->value.oper  = OP_DEG;
                 break;
-            } case ('s'): { //115
+            } case (OP_SIN): { //115
                 node->tp_node = TP_OPERATION;
                 node->value.oper  = OP_SIN;
                 node->left = NULL;
                 break;
-            } case ('c'): { //99
+            } case (OP_COS): { //99
                 node->tp_node = TP_OPERATION;
                 node->value.oper  = OP_COS;
                 node->left = NULL;
                 break;            
-            } case ('l'): { 
+            } case (OP_LN): { 
                 node->tp_node = TP_OPERATION;
                 node->value.oper  = OP_LN;
                 node->left = NULL;
@@ -127,10 +127,14 @@ void dtor_tree(Node *node) {
 
 bool checking_for_priority(Node *node, Node *parent) {
     if (!node || !parent) return false;
-    // if ()
-    if ((parent->value.oper == OP_ADD || parent->value.oper == OP_SUB) && node->tp_node == TP_OPERATION) return true;
+
+    if (parent->tp_node == TP_OPERATION && node->tp_node == TP_OPERATION && 
+    ((parent->value.oper == OP_ADD || parent->value.oper == OP_SUB) || (node->value.oper == parent->value.oper)))
+        return true;
+
     else return false;
 }
+
 void print_tree(Node *node, Node *parent) {
 
     if (!node) return;
@@ -181,6 +185,7 @@ void print_node(FILE *file, Node *node) {
                 case OP_LN:
                     fprintf(file, "ln");
                     break;
+    
                 case OP_ADD:
                     fprintf(file, " + ");
                     break;
@@ -202,7 +207,7 @@ void print_node(FILE *file, Node *node) {
                     break;
 
                 default:
-                    fprintf(file, "don't find oper", node->value.oper);
+                    fprintf(file, "don't find oper");
                     break;
             }
             break;
@@ -275,8 +280,11 @@ void graph_dump(FILE *dot_file, Node *node, Node *node_son) {
 
 }
 
-//--------------------------------------END TREE OUNPUT--------------------------------------------------------
-void tex_dump(Node *node) {
+//--------------------------------------END TREE OUNPUT----------------------------------------------------------
+
+//----------------------------------------END TEX_DUMP-----------------------------------------------------------
+
+void title_tex_dump(Node *node) {
 
     const char *FILE_TEX = "/mnt/c/Users/User/Desktop/programs/differentiator/res/tex_dump1.tex";
 
@@ -287,7 +295,7 @@ void tex_dump(Node *node) {
     fprintf(file_tex, "\\usepackage[utf8]{inputenc}\n");
     fprintf(file_tex, "\\usepackage[russian]{babel}\n");
 
-    fprintf(file_tex, "\\title{КАЛ ГОВНА}\n");
+    fprintf(file_tex, "\\title{ВЗЯТИЕ ПРОИЗВОДНОЙ КРОКОДИЛА}\n");
     fprintf(file_tex, "\\author{Кузнецова Елизавета Юрьевна}\n");
     fprintf(file_tex, "\\date{22.11.2022}\n");
     
@@ -296,11 +304,10 @@ void tex_dump(Node *node) {
     fprintf(file_tex, "\\maketitle\n");
 
     fprintf(file_tex, "\\newpage\n");
-    fprintf(file_tex, "We have now added a title, author and date to our first \\LaTeX{} document!\n");
-    fprintf(file_tex, "We have now added a title, author and date to our first \\LaTeX{} document!\n");
+    fprintf(file_tex, "Подробное описание взятия производной заданной функции:\n");
     fprintf(file_tex, "\\[f(x) =");
 
-    printf_tex(file_tex, node);
+    print_tex(file_tex, node, NULL);
     fprintf(file_tex, "\\]\n");
 
     fprintf(file_tex, "\\end{document}\n");
@@ -310,23 +317,55 @@ void tex_dump(Node *node) {
     system("pdflatex res/tex_dump1.tex");
 }
 
-void printf_tex(FILE *file_tex, Node *node) {
+void print_tex(FILE *file_tex, Node *node, Node *parent) {
+
     if (!node) return;
 
-    if (node->left) {
+    if (checking_for_priority(node, parent)) ;
+    else if (node->left && parent)
         fprintf(file_tex, "(");
-        printf_tex(file_tex, node->left);
+    
+    if (parent && parent->value.oper == OP_DEG){
+        fprintf(file_tex, "{");
     }
 
-    printf_tex_node(file_tex, node);
+    if (node->value.oper == OP_DIV) {
+        fprintf(file_tex, "{");
+    }
     
-    if (node->right) {
-        printf_tex(file_tex, node->right);
-        fprintf(file_tex, ")");
+    if (parent && parent->value.oper == OP_DIV) {
+        fprintf(file_tex, "{");
+    }
+    
+    if (!(!node->left && node->right)) {
+        print_tex(file_tex, node->left, node);
+    }
+
+    print_tex_node(file_tex, node);
+    
+    print_tex(file_tex, node->right, node);
+
+
+
+    if ((parent && parent->value.oper == OP_DIV)) {
+        fprintf(file_tex, "}");
+    } 
+    
+    if (node->value.oper == OP_DIV) {
+        fprintf(file_tex, "}");
+    }
+
+    if (checking_for_priority(node, parent)) ;
+    else if (node->right && !(!node->left && node->right) && parent) 
+            fprintf(file_tex, ")");
+            
+
+    if (parent && parent->value.oper == OP_DEG) {
+        fprintf(file_tex, "}");
     }
 }
 
-void printf_tex_node(FILE *file_tex, Node *node) {
+void print_tex_node(FILE *file_tex, Node *node) {
     assert(node && "node null");
 
     switch (node->tp_node) {
@@ -343,24 +382,29 @@ void printf_tex_node(FILE *file_tex, Node *node) {
                 case OP_LN:
                     fprintf(file_tex, "\\ln");
                     break;
+    
                 case OP_ADD:
                     fprintf(file_tex, " + ");
-                    break; 
+                    break;
+                
                 case OP_SUB:
                     fprintf(file_tex, " - ");
-                    break; 
+                    break;
+                
+                case OP_MUL:
+                    fprintf(file_tex, " \\cdot ");
+                    break;
+                
+                case OP_DIV:
+                    fprintf(file_tex, " \\over ");
+                    break;
+
                 case OP_DEG:
                     fprintf(file_tex, "^");
-                    break;                  
-                case OP_MUL:
-                    fprintf(file_tex, "\\cdot ");
-                    break;   
-                              
-                case OP_DIV:
-                    fprintf(file_tex, " \\over");
-                    break; 
+                    break;
+
                 default:
-                    fprintf(file_tex, " %c ", node->value.oper);
+                    fprintf(file_tex, "don't find oper");
                     break;
             }
             break;
@@ -370,13 +414,19 @@ void printf_tex_node(FILE *file_tex, Node *node) {
             break;
 
         case TP_NUMBER:
-            fprintf(file_tex, "%d", node->value.number);
+            if (node->value.number < 0) {
+                fprintf(file_tex, "(%d)", node->value.number);
+            } else {
+                fprintf(file_tex, "%d", node->value.number);
+            }
             break;
 
         default:
             break;
     }
 }
+//----------------------------------------END TEX_DUMP-----------------------------------------------------------
+
 
 
 
@@ -392,10 +442,6 @@ Node *copy_tree(Node *node) {
     copy_node->left      = node->left;
     copy_node->right     = node->right;
     copy_node->value     = node->value;
-    // copy_node->value.number     = node->value.number;
-    // copy_node->value.var     = node->value.var;
-    // copy_node->value.oper     = node->value.oper;
-
     copy_node->right     = node->right;
     copy_node->tp_node   = node->tp_node;
 
@@ -426,6 +472,9 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
         case TP_OPERATION:
             node->value.oper = (TYPE_OPERATION)value;
+            break;
+
+        case TP_VAR:
             break;
 
         default:
@@ -522,13 +571,13 @@ int folding_constant(Node *node, int *continue_optimiz) {
             node->right = NULL;
             *continue_optimiz = 1;
 
-        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && (IS_ONE(node->left))) {
+        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && IS_ONE(node->left)) {
             COPY_NODE(node->right);
             node->left = node->right->left;  
             node->right = node->right->right;
             *continue_optimiz = 1;       
 
-        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && (IS_ONE(node->right))) {
+        } else if ((IS_NODE_OP(OP_MUL) || IS_NODE_OP(OP_DEG)) && IS_ONE(node->right)) {
             COPY_NODE(node->left);
             node->right = node->left->right;
             node->left = node->left->left;  
