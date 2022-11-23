@@ -21,7 +21,8 @@ enum TYPE_OPERATION {
     OP_DEG = '^',
     OP_LN  = 'ln',
 };
-union type_node {
+
+union u_type_node {
     TYPE_OPERATION  oper;
     int             number;
     char *          var;
@@ -29,10 +30,7 @@ union type_node {
 
 struct Node {
     TYPE_NODE       tp_node;
-    type_node       value;
-    // TYPE_OPERATION  op_value;
-    // int             value;
-    // char *          var_value;
+    u_type_node       value;
     Node *          left;
     Node *          right;
 };
@@ -53,13 +51,20 @@ Node *tree_add_elem(Node *node, char *elem);
 
 void dump_tree(Node *root);
 
-void printf_tree(Node *node);
+void print_tree(Node *node, Node *parent);
 
 void print_node(FILE *file, Node *node);
 
 void graph_dump(FILE *dot_file, Node *node, Node *node_son);
 
 void close_file();
+
+void tex_dump(Node *node);
+
+void printf_tex(FILE *file_tex, Node *node);
+
+void printf_tex_node(FILE *file_tex, Node *node);
+
 
 
 

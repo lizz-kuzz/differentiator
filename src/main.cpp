@@ -12,8 +12,9 @@ int main(int argc, char *argv[]) {
     Tree tree = {};
 
     ctor_tree(FILE_INPUT, &tree);
+    // tex_dump(tree.root_tree);
     
-    printf_tree(tree.root_tree);
+    print_tree(tree.root_tree, NULL);
     dump_tree(tree.root_tree);
     tree.root_tree = diff_tree(tree.root_tree);
 
@@ -23,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     dump_tree(tree.root_tree);
     
-    printf_tree(tree.root_tree);
+    // print_tree(tree.root_tree, NULL);
     dtor_tree(tree.root_tree);
     close_file();
 }
