@@ -3,11 +3,15 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include "../include/DSL.hpp"
 
-int get_g(char **text_prog);
-int get_e(char **text_prog);
-int get_t(char **text_prog);
-int get_p(char **text_prog);
-int get_n(char **text_prog);
+Node *get_g(char **text_prog);
+Node *get_e(char **text_prog);
+Node *get_t(char **text_prog);
+Node *get_d(char **text_prog);
+Node *get_u(char **text_prog);
+Node *get_p(char **text_prog);
+Node *get_number(char **text_prog);
+Node *get_var(char **text_prog);
 
 #endif

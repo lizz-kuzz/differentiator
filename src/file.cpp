@@ -73,7 +73,7 @@ char *program_text_normalize(char *text)  {
         if (*text == '\n') 
             *text = ' ';
         
-        if (*text == ' ')
+        while (*text == ' ')
             text++;
 
         *point = *text;

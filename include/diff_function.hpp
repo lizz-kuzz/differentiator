@@ -9,6 +9,7 @@ enum TYPE_NODE {
     TP_OPERATION = 1,
     TP_VAR = 2,
     TP_NUMBER = 3,
+    TP_BRACKET = 4, //for tokens
 };
 
 enum TYPE_OPERATION {
@@ -22,15 +23,15 @@ enum TYPE_OPERATION {
     OP_LN  = 'l',
 };
 
-union u_type_node {
+union data {
     TYPE_OPERATION  oper;
     int             number;
     char *          var;
 };
 
 struct Node {
-    TYPE_NODE       tp_node;
-    u_type_node       value;
+    TYPE_NODE       type;
+    data            value;
     Node *          left;
     Node *          right;
 };
@@ -38,6 +39,53 @@ struct Node {
 struct Tree {
     Node *root_tree;
 };
+
+struct token_elem {
+    char      *elem;
+    TYPE_NODE  type;
+};
+
+struct Tokenizer {
+    token_elem *array;
+    int         size;
+    int         capacity;
+};
+
+
+// -------------------------------------BEGIN RECURSIVE DESCENT FUNC---------------------------------------------------
+
+Node *get_g(Tokenizer *tokens);
+
+Node *get_add_sub(Tokenizer *tokens);
+
+Node *get_mul_div(Tokenizer *tokens);
+
+Node *get_deg(Tokenizer *tokens);
+
+Node *get_unary_op(Tokenizer *tokens);
+
+Node *get_bracket(Tokenizer *tokens);
+
+Node *get_number(Tokenizer *tokens);
+
+Node *get_var(Tokenizer *tokens);
+
+// -------------------------------------END RECURSIVE DESCENT FUNC---------------------------------------------------
+
+// -------------------------------------BEGIN TOKENIZER FUNC---------------------------------------------------
+void create_number_token(Tokenizer *tokens, char **text_buf, int ip);
+
+void create_oper_token(Tokenizer *tokens, char **text_buf, int ip);
+
+void create_var_token(Tokenizer *tokens, char **text_buf, int ip);
+
+void tokenizer_ctor(Tokenizer *tokens, char *text_buf);
+
+void tokenizer_dtor(Tokenizer *tokens);
+
+int is_oper(char symbol);
+
+// -------------------------------------END TOKENIZER FUNC---------------------------------------------------
 
 Node *create_tree_from_text(Node *node, char **text_buf);
 
@@ -68,81 +116,18 @@ void print_tex_node(FILE *file_tex, Node *node);
 
 
 
-#define CREATE_NUM(val)       create_node(TP_NUMBER, val, NULL, NULL)
-
-#define ADD(node_l, node_r)   create_node(TP_OPERATION, OP_ADD, node_l, node_r)
-
-#define SUB(node_l, node_r)   create_node(TP_OPERATION, OP_SUB, node_l, node_r)
-
-#define MUL(node_l, node_r)   create_node(TP_OPERATION, OP_MUL, node_l, node_r)
-
-#define DIV(node_l, node_r)   create_node(TP_OPERATION, OP_DIV, node_l, node_r)
-
-#define SIN(node)             create_node(TP_OPERATION, OP_SIN, NULL, node)
-
-#define COS(node)             create_node(TP_OPERATION, OP_COS, NULL, node)
-
-#define DEG(node_l, node_r)   create_node(TP_OPERATION, OP_DEG, node_l, node_r)
-
-#define LN(node)              create_node(TP_OPERATION, OP_LN, NULL, node)
-
-#define dL diff_tree(node->left)
-#define dR diff_tree(node->right)
-#define cL copy_tree(node->left)
-#define cR copy_tree(node->right)
-
 Node *diff_tree(Node *node);
 
 Node *copy_tree(Node *node); 
 
 Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_right);
 
+Node *create_var_node(char *var, Node *node_left, Node *node_right);
 
 
-#define IS_NODE_OP(OP) (node->tp_node == TP_OPERATION && node->value.oper == OP)
 
-#define IS_ZERO(node) (node->tp_node == TP_NUMBER && node->value.number == 0)
+int pow(int x, int y);
 
-#define IS_ONE(node) (node->tp_node == TP_NUMBER && node->value.number == 1)
-
-#define COPY_NODE(copy_node)                                        \
-                node->tp_node = copy_node->tp_node;                 \
-                node->value.oper = copy_node->value.oper;           \
-                node->value.number = copy_node->value.number;       \
-                node->value.var = copy_node->value.var;             \
-                               
-
-#define IS_CONST_NODE(node) node->left->tp_node == TP_NUMBER && node->right->tp_node == TP_NUMBER
-
-#define OP_CONST(OP)                                                        \
-                node->tp_node = TP_NUMBER;                                  \
-                switch (OP) {                                               \
-                case OP_ADD:                                                \
-                    node->value.number = node->left->value.number + node->right->value.number;   \
-                    break;                                                  \
-                case OP_SUB:                                                \
-                    node->value.number = node->left->value.number - node->right->value.number;   \
-                    break;                                                  \
-                case OP_MUL:                                                \
-                    node->value.number = node->left->value.number * node->right->value.number;   \
-                    break;                                                  \
-                case OP_DIV:                                                \
-                    node->value.number = node->left->value.number / node->right->value.number;   \
-                    break;                                                  \
-                case OP_SIN:                                                \
-                    break;                                                  \
-                case OP_COS:                                                \
-                    break;                                                  \
-                case OP_LN:                                                 \
-                    break;                                                  \
-                case OP_DEG:                                                \
-                    break;                                                  \
-                default:                                                    \
-                    break;                                                  \
-                }                                                           \
-                node->left = NULL;                                          \
-                node->right = NULL;                                         \
-                
 
 void optimizer_tree(Node *node);
 
