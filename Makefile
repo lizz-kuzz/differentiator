@@ -6,9 +6,9 @@ FLAGS = -g -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-e
 СС = g++
 
 calc:
-	@$(CC) $(FLAGS) calculator/main.cpp src/file.cpp src/diff_function.cpp -o calc.out
+	@$(CC) $(FLAGS) calculator/main.cpp src/file.cpp src/diff_function.cpp -o calc.exe
 
 diff:
-	@$(CC) $(FLAGS) src/main.cpp src/file.cpp src/diff_function.cpp -o do.out
+	@ g++ $(FLAGS) src/main.cpp src/file.cpp src/diff_function.cpp -o do.exe
 
 

@@ -2,12 +2,13 @@
 #include "../include/DSL.hpp"
 #include "../include/file.hpp"
 
+const char *NAME_GRAPH_FILE = "res/graph.dot";
+const char *NAME_FILE =       "res/text_output.txt";
+
+FILE *file_tree = fopen(NAME_FILE, "w");
 
 // -------------------------------------BEGIN TREE FUNCTIONS--------------------------------------
 
-const char *NAME_GRAPH_FILE = "res/graph.dot";
-const char *NAME_FILE =       "res/text_output.txt";
-FILE *file_tree = fopen(NAME_FILE, "w");
 
 const int MAX_SIZE = 10;
 
@@ -15,15 +16,17 @@ void ctor_tree(const char *FILE_INPUT, Tree *tree) {
     char *text_buf;
 
     text_buf = read_file(FILE_INPUT, text_buf);
-    printf("%s\n", text_buf);
+    // printf("%s\n", text_buf);
     char *point_text_buf = text_buf;
+
     Tokenizer tokens = {};
+
     tokenizer_ctor(&tokens, point_text_buf);
 
-    for (int i = 0; i < tokens.capacity; i++) {
-        printf("%d [%s] ", tokens.array[i].type, tokens.array[i].elem);
-    }
-    printf("\n");
+    // for (int i = 0; i < tokens.capacity; i++) {
+    //     printf("%d [%s] ", tokens.array[i].type, tokens.array[i].elem);
+    // }
+    // printf("\n");
 
     tree->root_tree = (Node *) calloc(1, sizeof(Node));
 
@@ -404,41 +407,37 @@ void tokenizer_dtor(Tokenizer *tokens) {
 
 //--------------------------------------BEGIN TREE OUNPUT--------------------------------------------------------
 
-bool checking_for_priority(Node *node, Node *parent) {
-    if (!node || !parent) return false;
+int checking_for_priority(Node *node, Node *parent) {
 
-    if (parent->type == TP_OPERATION && node->type == TP_OPERATION && 
-        ((parent->value.oper == OP_ADD || parent->value.oper == OP_SUB) || (node->value.oper == parent->value.oper)))
-        return true;
+    if (!node || !parent) return 0;
 
-        // исправить тут черезе return выражения
+    return (parent->type == TP_OPERATION && node->type == TP_OPERATION && 
+          ((parent->value.oper == OP_ADD || parent->value.oper == OP_SUB) ||
+           (node->value.oper == parent->value.oper) || 
+           (node->value.oper == OP_MUL && parent->value.oper == OP_DIV) ||
+           (parent->value.oper == OP_MUL && node->value.oper == OP_DIV)));
 
-    else return false;
 }
 
 void print_tree(Node *node, Node *parent) {
-
-    if (!node) return;
-// вывод скобок кринж
-    if (checking_for_priority(node, parent)) {
-
-    } else if (node->left && parent) {
-        fprintf(file_tree, "(");
-    }
-   
-    if (!(!node->left && node->right)) {
-        print_tree(node->left, node);
-    }
-
-    print_node(file_tree, node);
-    
-    if (node->right) {
-
+     
+    if (!node) return;     
+     
+    if (node->left && parent && !checking_for_priority(node, parent)) {     
+        fprintf(file_tree, "(");     
+    }     
+        
+    if (!(!node->left && node->right)) {     
+        print_tree(node->left, node);     
+    }     
+     
+    print_node(file_tree, node);     
+         
+    if (node->right) {     
+     
         print_tree(node->right, node);
-
-        if (checking_for_priority(node, parent)) {
-
-        } else if (!(!node->left && node->right) && parent) {
+        
+        if (!(!node->left && node->right) && parent && !checking_for_priority(node, parent)) {
             fprintf(file_tree, ")");
         }
         
@@ -563,17 +562,30 @@ void graph_dump(FILE *dot_file, Node *node, Node *node_son) {
 
 //----------------------------------------BEGIN TEX_DUMP-----------------------------------------------------------
 
+const char *FILE_TEX = "res/tex_dump1.tex";
+FILE *file_tex = fopen(FILE_TEX, "w");
+
+const char *tex_phrases[7] = { "очевидно, что фупм гавно, а также, что:\\newline", 
+                               "не составит труда, осознать, что РТ лучший факультет, а также, что:\\newline",
+                               "зарубите себе на носу данный факт:\\newline",
+                               "данное выражение упрощается очевидным способом(если для вас это не очевидно, это ваши проблемы :) ):\\newline",
+                               "не требует дальнейших комментариев:\\newline",
+                               "легко зметить, что фопф - х***я, ну а так же, что:\\newline",
+                               "как всем известно, фивты по ночам с фопфами...дифференцируют имеено так:\\newline",
+                            };
+
+static int number_phrases = 1;
+
+
 void title_tex_dump(Node *node) {
 
-    const char *FILE_TEX = "res/tex_dump1.tex";
-    // const char *FILE_TEX = "../res/tex_dump1.tex";
-
-    FILE *file_tex = fopen(FILE_TEX, "w");
 
     fprintf(file_tex, "\\documentclass[12pt, letterpaper, twoside]{article}\n");
     fprintf(file_tex, "\\usepackage[T1]{fontenc}\n");
     fprintf(file_tex, "\\usepackage[utf8]{inputenc}\n");
     fprintf(file_tex, "\\usepackage[russian]{babel}\n");
+    fprintf(file_tex, "\\usepackage[a1paper]{geometry}\n"
+                      "\\geometry{papersize={29.7 cm, 25.0 cm}}\n");
 
     fprintf(file_tex, "\\title{ВЗЯТИЕ ПРОИЗВОДНОЙ КРОКОДИЛА}\n");
     fprintf(file_tex, "\\author{Очевидно, что Кузнецова Елизавета Юрьевна}\n");
@@ -584,55 +596,151 @@ void title_tex_dump(Node *node) {
     fprintf(file_tex, "\\maketitle\n");
 
     fprintf(file_tex, "\\newpage\n");
-    dump_tree(node);
+     
     fprintf(file_tex, "Подробное описание взятия производной заданной функции:\n");
+
     fprintf(file_tex, "\\[f(x) =");
     print_tex(file_tex, node, NULL);
-    fprintf(file_tex, "\\]\n\n");
+    fprintf(file_tex, "\\]\\newline\\newline");  
+   
+}
 
+void print_tex_diff_node(FILE *file_tex, int is_diff, Node *node) {
 
-    node = diff_tree(node);
-    fprintf(file_tex, "Производная заданной функции:\n");
-    fprintf(file_tex, "\\[f'(x) =");
+    assert(node != NULL && "null poiner in tex_dump");
+
+    if (is_diff)
+        fprintf (file_tex, "{(");
+
     print_tex(file_tex, node, NULL);
-    fprintf(file_tex, "\\]\n\n");
+
+    if (is_diff)
+        fprintf (file_tex, ")}^{\'}");
+
+}
+
+void print_tex_diff_tree(FILE *file_tex, TYPE_OPERATION oper, Node *node) {
+
+    assert(node != NULL && "null poiner in tex_dump");
+
+    switch (oper) {
+        
+        case OP_ADD: {
+            print_tex_diff_node(file_tex, 1, node->left);
+            fprintf(file_tex, " + ");
+            print_tex_diff_node(file_tex, 1, node->right);
+            break;
+
+        } case OP_SUB: {
+            print_tex_diff_node(file_tex, 1, node->left);
+            fprintf(file_tex, " - ");
+            print_tex_diff_node(file_tex, 1, node->right);
+            break;
+
+        } case OP_MUL: {   
+            print_tex_diff_node(file_tex, 1, node->left);
+            fprintf(file_tex, "\\cdot ");
+            print_tex_diff_node(file_tex, 0, node->right); 
+            fprintf(file_tex, " + "); 
+            print_tex_diff_node(file_tex, 0, node->left);
+            fprintf(file_tex, "\\cdot ");
+            print_tex_diff_node(file_tex, 1, node->right); 
+            break; 
+
+        } case OP_DIV: {
+            fprintf(file_tex, "{{");
+            print_tex_diff_node(file_tex, 1, node->left);
+            fprintf(file_tex, "\\cdot ");
+            print_tex_diff_node(file_tex, 0, node->right); 
+            fprintf(file_tex, " - "); 
+            print_tex_diff_node(file_tex, 0, node->left);
+            fprintf(file_tex, "\\cdot ");
+            print_tex_diff_node(file_tex, 1, node->right); 
+            fprintf(file_tex, "} \\over {(");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf(file_tex, ")}^2}");
+            break;
+
+        } case OP_SIN: {
+            fprintf(file_tex, "cos(");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf(file_tex, ") \\cdot");
+            print_tex_diff_node(file_tex, 1, node->right);
+            break;
+
+        } case OP_COS: {
+            fprintf(file_tex, "- \\sin (");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf(file_tex, ") \\cdot");
+            print_tex_diff_node(file_tex, 1, node->right);
+            break;
+
+        } case OP_DEG: {
+            fprintf (file_tex, "(");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf (file_tex, ")");
+            fprintf (file_tex, "\\cdot {");
+            print_tex_diff_node(file_tex, 0, node->left);
+            fprintf (file_tex, "}^{");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf (file_tex, " - 1} \\cdot");
+            print_tex_diff_node(file_tex, 1, node->left);
+            break;
+
+        } case OP_LN: {
+            fprintf (file_tex, "{{");
+            print_tex_diff_node(file_tex, 1, node->right);
+            fprintf (file_tex, " } \\over {");
+            print_tex_diff_node(file_tex, 0, node->right);
+            fprintf (file_tex, "}}");
+            break;
+        }
+
+        default:
+            break;
+    }
+
+}
 
 
-    optimizer_tree(node);
+
+void optimiz_tex_dump(Node *node) {
+
     fprintf(file_tex, "Упростим данного крокодила(что является достаточно очевидной задачей):\n");
     fprintf(file_tex, "\\[f'(x) =");
     print_tex(file_tex, node, NULL);
-    fprintf(file_tex, "\\]\n\n");
-    fprintf(file_tex, "\\end{document}\n");
+    fprintf(file_tex, "\\]\n\\newline\\newline");
 
-    print_tree(node, NULL);
+    
+}
+
+void diff_func_title_tex_dump(Node *node) {
+
+    fprintf(file_tex, "Производная заданной функции:\n");
+    fprintf(file_tex, "\\[f'(x) =");
+    print_tex(file_tex, node, NULL);
+    fprintf(file_tex, "\\]\n\\newline\\newline");  
+
+}
+
+void end_tex_dump() {
+
+    fprintf(file_tex, "\\end{document}\n");
     
     fclose(file_tex);
 
     system("pdflatex res/tex_dump1.tex >res/text_tex.txt");
 }
-
+ 
 void print_tex(FILE *file_tex, Node *node, Node *parent) {
 
     if (!node) return;
+    
+    fprintf(file_tex, "{");
 
-    if (checking_for_priority(node, parent))
-        ;
-    else if (node->left && parent)
+    if (node->left && parent && !checking_for_priority(node, parent))
         fprintf(file_tex, "(");
-    
-    if (parent && parent->value.oper == OP_DEG){
-        fprintf(file_tex, "{");
-    }
 
-    if (node->value.oper == OP_DIV) {
-        fprintf(file_tex, "{");
-    }
-    
-    if (parent && parent->value.oper == OP_DIV) {
-        fprintf(file_tex, "{");
-    }
-    
     if (!(!node->left && node->right)) {
         print_tex(file_tex, node->left, node);
     }
@@ -642,23 +750,29 @@ void print_tex(FILE *file_tex, Node *node, Node *parent) {
     print_tex(file_tex, node->right, node);
 
 
-
-    if ((parent && parent->value.oper == OP_DIV)) {
-        fprintf(file_tex, "}");
-    } 
-    
-    if (node->value.oper == OP_DIV) {
-        fprintf(file_tex, "}");
-    }
-
-    if (checking_for_priority(node, parent)) ;
-    else if (node->right && !(!node->left && node->right) && parent) 
-            fprintf(file_tex, ")");
+    if (node->right && !(!node->left && node->right) && parent && !checking_for_priority(node, parent)) 
+        fprintf(file_tex, ")");
             
+    fprintf(file_tex, "}");
+}
 
-    if (parent && parent->value.oper == OP_DEG) {
-        fprintf(file_tex, "}");
-    }
+void print_tex_const_node(Node *node) {
+
+    fprintf(file_tex, "%s\n", tex_phrases[number_phrases % 7]);
+    number_phrases++;
+    fprintf(file_tex, "\\[{(");
+    print_tex_node(file_tex, node);
+    fprintf(file_tex, ")}^{\'} = 0 \\]\n\n");
+
+}
+void print_tex_var_node(Node *node) {
+
+    fprintf(file_tex, "%s\n", tex_phrases[number_phrases % 7]);
+    number_phrases++;
+    fprintf(file_tex, "\\[{(");
+    print_tex_node(file_tex, node);
+    fprintf(file_tex, ")}^{\'} = 1 \\]\n\n");
+
 }
 
 void print_tex_node(FILE *file_tex, Node *node) {
@@ -773,17 +887,13 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
         }
 
         case TP_VAR: {
-            // char *var = (char *)calloc(MAX_SIZE, sizeof(char));
-            // *var = (char)value;
-            // node->value.var = var;
-            // break;
+            break;
         }
 
         default:
             printf("didn't find type node\n");
             break;
     }
-    // printf("%d ", value);
 
     return node;
 }
@@ -802,15 +912,29 @@ Node *create_var_node(char *var, Node *node_left, Node *node_right) {
     return node;
 }
 
-
 Node *diff_tree(Node *node) {
-   
     switch (node->type) {
-        case TP_NUMBER: return CREATE_NUM(0);
+        case TP_NUMBER: {
+            print_tex_const_node(node);
+            return CREATE_NUM(0);
 
-        case TP_VAR:    return CREATE_NUM(1);
+        }
+
+        case TP_VAR: {
+            print_tex_var_node(node);
+            return CREATE_NUM(1);
+        } 
 
         case TP_OPERATION: {
+
+            fprintf(file_tex, "%s\\newline", tex_phrases[number_phrases % 7]);
+            number_phrases++;
+            fprintf(file_tex, "\\[{(");
+            print_tex(file_tex, node, NULL);
+            fprintf(file_tex, ")}^{\'} = ");
+            print_tex_diff_tree(file_tex, node->value.oper, node);
+            fprintf(file_tex, "\\]\n\\newline");  
+
             switch (node->value.oper) {
                 case OP_ADD: 
                     return ADD(dL, dR);
@@ -831,6 +955,7 @@ Node *diff_tree(Node *node) {
                     return MUL(MUL(SIN(cR), CREATE_NUM(-1)), dR);
                 
                 case OP_DEG:
+
                     if (node->left->type == TP_NUMBER) {
                         return MUL(DEG(cL, cR), MUL(dR, LN(cL)));
                     } else {
@@ -838,6 +963,7 @@ Node *diff_tree(Node *node) {
                     }
 
                 case OP_LN:
+
                     if (node->right->type == TP_NUMBER) {
                         return CREATE_NUM(0);
                     } else {
@@ -884,7 +1010,7 @@ int folding_constant(Node *node, int *continue_optimiz) {
 
     if (node->left && node->right) {
 
-        if (IS_NODE_OP(OP_MUL) && ((IS_ZERO(node->left)) || (IS_ZERO(node->right)))) {
+        if (IS_NODE_OP(OP_MUL) && (IS_ZERO(node->left) || IS_ZERO(node->right))) {
             node->type = TP_NUMBER;
             node->value.number = 0;
             node->left = NULL;
@@ -915,9 +1041,16 @@ int folding_constant(Node *node, int *continue_optimiz) {
             node->left = node->left->left; 
             *continue_optimiz = 1;
 
-        } else if (node->type == TP_OPERATION && IS_CONST_NODE(node)) {
+        } else if (node->type == TP_OPERATION && (IS_CONST_SON_NODE(node))) {
             OP_CONST(node->value.oper);
             *continue_optimiz = 1;
+        } else if (IS_NODE_OP(OP_DEG) && IS_ZERO(node->right)) {
+            node->type = TP_NUMBER;
+            node->value.number = 1;
+            node->left = NULL;
+            node->right = NULL;
+            *continue_optimiz = 1;
+
         }
     }
 
@@ -933,4 +1066,4 @@ int pow(int x, int y) {
     }
     return x;
 }
-//-------------------------------END OPTIMIZER--------------------------------------------
+//---------------------------------------END OPTIMIZER---------------------------------------------

@@ -43,7 +43,7 @@
                 node->value.var = copy_node->value.var;             \
                                
 
-#define IS_CONST_NODE(node) node->left->type == TP_NUMBER && node->right->type == TP_NUMBER
+#define IS_CONST_SON_NODE(node) node->left->type == TP_NUMBER && node->right->type == TP_NUMBER
 
 
 #define OP_CONST(OP)                                                        \

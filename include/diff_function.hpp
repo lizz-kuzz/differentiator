@@ -72,7 +72,10 @@ Node *get_var(Tokenizer *tokens);
 
 // -------------------------------------END RECURSIVE DESCENT FUNC---------------------------------------------------
 
+
+
 // -------------------------------------BEGIN TOKENIZER FUNC---------------------------------------------------
+
 void create_number_token(Tokenizer *tokens, char **text_buf, int ip);
 
 void create_oper_token(Tokenizer *tokens, char **text_buf, int ip);
@@ -87,6 +90,11 @@ int is_oper(char symbol);
 
 // -------------------------------------END TOKENIZER FUNC---------------------------------------------------
 
+
+
+
+// -------------------------------------BEGIN TREE FUNCTIONS--------------------------------------
+
 Node *create_tree_from_text(Node *node, char **text_buf);
 
 void ctor_tree(const char *FILE_INPUT, Tree *tree);
@@ -95,8 +103,13 @@ void dtor_tree(Node *node);
 
 Node *tree_add_elem(Node *node, char *elem);
 
+// -------------------------------------END TREE FUNCTIONS------------------------------------------------------------
 
-bool checking_for_priority(Node *node, Node *parent);
+
+
+//--------------------------------------BEGIN TREE OUNPUT FUNC--------------------------------------------------------
+
+int checking_for_priority(Node *node, Node *parent);
 
 void dump_tree(Node *root);
 
@@ -108,13 +121,37 @@ void graph_dump(FILE *dot_file, Node *node, Node *node_son);
 
 void close_file();
 
+//--------------------------------------END TREE OUNPUT FUNC----------------------------------------------------------
+
+
+
+//----------------------------------------BEGIN TEX_DUMP FUNC-----------------------------------------------------------
+
 void title_tex_dump(Node *node);
 
 void print_tex(FILE *file_tex, Node *node, Node *parent);
 
+void print_tex_diff_tree(FILE *file_tex, TYPE_OPERATION oper, Node *node);
+
 void print_tex_node(FILE *file_tex, Node *node);
 
+void diff_func_title_tex_dump(Node *node);
 
+void print_tex_diff_node(FILE *tex_file, int is_diff, Node *node);
+
+void optimiz_tex_dump(Node *node);
+
+void print_tex_const_node(Node *node);
+
+void print_tex_var_node(Node *node);
+
+void end_tex_dump();
+
+//----------------------------------------END TEX_DUMP FUNC-----------------------------------------------------------
+
+
+
+//------------------------------------BEGIN DIFFERENTIATOR FUNC-----------------------------------------------------------
 
 Node *diff_tree(Node *node);
 
@@ -124,13 +161,19 @@ Node *create_node(TYPE_NODE tp_node, int value, Node *node_left, Node *node_righ
 
 Node *create_var_node(char *var, Node *node_left, Node *node_right);
 
+//-----------------------------------------END DIFFERENTIATOR FUNC-----------------------------------------------------------
 
 
-int pow(int x, int y);
 
+//-----------------------------------------BEGIN OPTIMIZER FUNC--------------------------------------------------------------
 
 void optimizer_tree(Node *node);
 
 int folding_constant(Node *node, int *continue_optimiz);
+
+int pow(int x, int y);
+
+//-----------------------------------------END OPTIMIZER FUNC------------------------------------------
+
 
 #endif
